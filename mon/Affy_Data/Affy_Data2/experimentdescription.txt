@@ -1,0 +1,17 @@
+	DiseaseState
+GSM23413.cel	adenocarcinoma
+GSM23419.cel	adenocarcinoma
+GSM23427.cel	adenocarcinoma
+GSM23424.cel	adenocarcinoma
+GSM23422.cel	adenocarcinoma
+GSM23417.cel	adenocarcinoma
+GSM23426.cel	adenocarcinoma
+GSM23425.cel	adenocarcinoma
+GSM23388.cel	normal
+GSM23391.cel	normal
+GSM23385.cel	normal
+GSM23392.cel	normal
+GSM23386.cel	normal
+GSM23390.cel	normal
+GSM23387.cel	normal
+GSM23389.cel	normal
