@@ -1,0 +1,123 @@
+---
+title: "fastqc_summary"
+author: "Matthew Spriggs"
+date: "2024-11-19"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Taking the output from fastq I have a folder called `qc_checks/`. This contains html file and zip files for each of my sequences. I would like to summarize the samples into an easy to read format. This workbook will be used as a playground to design a working function. This function will be added to `utils.R` which is a general R script I will use for generic function for this assignment.
+
+## Set wd
+```{r}
+base_dir="~/Library/CloudStorage/OneDrive-Illumina,Inc./Documents/Applied Bioinformatics/modules/next_generation_sequencing_informatics/assignment/qc_checks/raw"
+setwd(base_dir)
+```
+
+```{r}
+library(tidyr)
+library(dplyr)
+```
+
+```{r}
+# Find all folders
+qc_filepath = paste0(base_dir,'qc_checks')
+dir_names = list.dirs(path = qc_filepath, recursive = FALSE)
+all_summary = list()
+sample_names = c()
+for (dir in dir_names){
+  print(dir)
+  file_path = file.path(dir, 'summary.txt')
+  if (file.exists(file_path)){
+    data = read.table(file_path,
+                      header = FALSE,
+                      sep = '\t',
+                      col.names = c('flag','metric','sample'))
+    # Extract sample name
+    sample_name = unique(data$sample)
+    sample_name = gsub('_[12].fq.gz', '', sample_name)
+    sample_names = append(sample_names, sample_name)
+    # Append into list all summary data
+    all_summary = append(all_summary, list(data))
+  } else {
+    warning(paste('File not found:', file_path))
+  }
+}
+
+names(all_summary) = sample_names
+# all_summary is a list with all the summary data
+print(all_summary[[1]])
+```
+
+```{r}
+# Loop through each item in all_summary and pivot
+
+pivoted_list = list()
+
+for (sample_summary in all_summary){
+  # print(sample_summary)
+  pvt = pivot_wider(sample_summary,names_from = metric, values_from = flag)
+  # print(pvt)
+  pivoted_list = append(pivoted_list, list(pvt))
+  print(length(pivoted_list))
+}
+
+# combine into dataframe
+df = bind_rows(pivoted_list)
+df
+
+```
+
+```{r}
+#' Pivot Summary Files
+#'
+#' This function reads summary files from a specified directory, processes the data, and returns a combined data frame with pivoted data.
+#'
+#' @param base_dir A string specifying the base directory containing the 'qc_checks' folder.
+#' @return A data frame with pivoted summary data.
+#' @examples
+#' result <- pivot_summary_files("/path/to/your/folder/")
+
+pivot_summary_files = function(base_dir) {
+  qc_filepath = base_dir
+  dir_names = list.dirs(path = qc_filepath, recursive = FALSE)
+  all_summary = list()
+  sample_names = c()
+  
+  for (dir in dir_names) {
+    file_path = file.path(dir, 'summary.txt')
+    if (file.exists(file_path)) {
+      data = read.table(
+        file_path, header = FALSE,
+        sep = '\t',
+        col.names = c('flag', 'metric', 'sample'))
+      sample_name = unique(data$sample)
+      sample_name = gsub('_[12].fq.gz', '', sample_name)
+      sample_names = append(sample_names, sample_name)
+      all_summary = append(all_summary, list(data))
+    } else {
+      warning(paste('File not found:', file_path))
+    }
+  }
+  
+  names(all_summary) = sample_names
+  pivoted_list = list()
+  
+  for (sample_summary in all_summary) {
+    pvt = pivot_wider(sample_summary, names_from = metric, values_from = flag)
+    pivoted_list = append(pivoted_list, list(pvt))
+  }
+  
+  df = bind_rows(pivoted_list)
+  return(df)
+}
+
+```
+
+```{r}
+df = pivot_summary_files(base_dir)
+write.table(df, paste0(base_dir,'/raw_summary.csv'), sep = ',', row.names = FALSE)
+```

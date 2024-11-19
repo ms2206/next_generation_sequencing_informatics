@@ -1,0 +1,11 @@
+PASS	Basic Statistics	B50981_2.fq.gz
+PASS	Per base sequence quality	B50981_2.fq.gz
+PASS	Per tile sequence quality	B50981_2.fq.gz
+PASS	Per sequence quality scores	B50981_2.fq.gz
+FAIL	Per base sequence content	B50981_2.fq.gz
+PASS	Per sequence GC content	B50981_2.fq.gz
+PASS	Per base N content	B50981_2.fq.gz
+PASS	Sequence Length Distribution	B50981_2.fq.gz
+FAIL	Sequence Duplication Levels	B50981_2.fq.gz
+PASS	Overrepresented sequences	B50981_2.fq.gz
+PASS	Adapter Content	B50981_2.fq.gz
